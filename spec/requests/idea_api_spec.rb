@@ -13,3 +13,12 @@ describe "api returns all ideas" do
     expect(json.first["title"]).to eq("Baconator")
   end
 end
+
+describe "api creates new idea" do
+  it "can create a new idea" do
+    post "/api/v1/ideas.json", {title: "Bacon", body: "You know dat bacon"}
+
+    expect(response.status).to eq(201)
+    expect(Idea.first.title).to eq("Bacon")
+  end
+end
