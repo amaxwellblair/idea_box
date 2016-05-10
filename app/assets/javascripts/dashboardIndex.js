@@ -2,9 +2,7 @@ $(document).ready(function() {
   getIdeas();
   $(".modal-trigger").leanModal();
   $("#create-trigger").click(function() {
-    var title = $("#create-title").val();
-    var body = $("#create-body").val();
-    createIdea(title, body);
+    createIdea();
   });
 });
 
@@ -19,10 +17,13 @@ function getIdeas() {
   });
 }
 
-function createIdea(title, body) {
-  console.log("hi there");
+function createIdea() {
+  var title = $("#create-title").val();
+  var body = $("#create-body").val();
   $.post("/api/v1/ideas.json", {title: title, body: body}, function(data) {
     appendIdea(data);
+    $("#create-title").val("");
+    $("#create-body").val("");
   });
 }
 
