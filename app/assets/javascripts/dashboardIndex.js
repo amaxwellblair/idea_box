@@ -1,5 +1,8 @@
 $(document).ready(function() {
-  getIdeas(updateIdea);
+  getIdeas(function() {
+    updateIdea();
+    destroyIdea();
+  });
   $(".modal-trigger").leanModal();
   $("#create-trigger").click(function() {
     createIdea();
@@ -25,6 +28,7 @@ function createIdea() {
     appendIdea(data);
     $("#create-title").val("");
     $("#create-body").val("");
+    updateIdea();
   });
 }
 
@@ -46,8 +50,22 @@ function updateIdea() {
 function destroyIdea() {
   document.querySelector(".delete-trigger").onclick = function () {
     var id = extractID(this.id);
-
+    deleteIdea(id);
   };
+}
+
+function deleteIdea(id) {
+  $.ajax({
+    type: "POST",
+    dataType: "json",
+    url: "/api/v1/idea/" + id + ".json",
+    headers: { "X-HTTP-Method-Override": "DELETE" },
+    data: { id: id },
+    success: function() {
+      removeIdea(id);
+      destroyIdea();
+    }
+  });
 }
 
 function patchIdea(id, title, body) {
@@ -61,6 +79,11 @@ function patchIdea(id, title, body) {
       overwriteIdea(id, title, body);
     }
   });
+}
+
+function removeIdea(id) {
+  var card = document.querySelector("#card-" + id);
+  card.parentNode.removeChild(card);
 }
 
 function overwriteIdea(id, title, body) {
@@ -81,6 +104,15 @@ function appendIdea(idea) {
 function ideaDiv(idea, content) {
   var card = document.createElement("div");
   card.className = "card";
+  card.id = "card-" + idea.id;
+
+  var buttonHolder = document.createElement("div");
+  buttonHolder.className = "card-action";
+
+  var deleteButton = document.createElement("button");
+  deleteButton.id = "delete-" + idea.id;
+  deleteButton.className = "delete-trigger btn";
+  deleteButton.innerHTML = "Delete";
 
   var link = document.createElement("a");
   link.className = "update-trigger";
@@ -91,6 +123,8 @@ function ideaDiv(idea, content) {
   innerIdea.innerHTML = content;
 
   link.appendChild(innerIdea);
+  buttonHolder.appendChild(deleteButton);
   card.appendChild(link);
+  card.appendChild(buttonHolder);
   return card;
 }
