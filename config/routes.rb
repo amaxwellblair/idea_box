@@ -7,6 +7,7 @@ Rails.application.routes.draw do
       get "/ideas", to: "ideas#index"
       post "/ideas", to: "ideas#create"
       patch "/idea/:id", to: "ideas#update"
+      delete "/idea/:id", to: "ideas#destroy"
     end
   end
 
