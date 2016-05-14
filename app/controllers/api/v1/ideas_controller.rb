@@ -17,6 +17,11 @@ module Api
         respond_with status: 204, location: nil
       end
 
+      def destroy
+        Idea.delete(params[:id])
+        respond_with status: 204, location: nil
+      end
+
       private
         def idea_params
           params.permit(:title, :body)

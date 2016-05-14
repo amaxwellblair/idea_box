@@ -36,3 +36,14 @@ describe "api updates an idea" do
     expect(Idea.first.title).to eq("Bacon")
   end
 end
+
+describe "api deletes an idea" do
+  it "can delete an idea" do
+    idea = Idea.create(title: "Bacon returns", body: "On my desk")
+    delete "/api/v1/idea/#{idea.id}.json", {id: idea.id}
+
+    expect(response.status).to eq(204)
+
+    expect(Idea.first).to eq(nil)
+  end
+end
