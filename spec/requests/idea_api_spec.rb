@@ -18,7 +18,21 @@ describe "api creates new idea" do
   it "can create a new idea" do
     post "/api/v1/ideas.json", {title: "Bacon", body: "You know dat bacon"}
 
+    json = JSON.parse(response.body)
+
     expect(response.status).to eq(201)
+    expect(Idea.first.title).to eq("Bacon")
+    expect(json["title"]).to eq("Bacon")
+  end
+end
+
+describe "api updates an idea" do
+  it "can update an idea" do
+    idea = Idea.create(title: "Bacon returns", body: "On my desk")
+    patch "/api/v1/idea/#{idea.id}.json", {title: "Bacon", body: "You know dat bacon"}
+
+    expect(response.status).to eq(204)
+
     expect(Idea.first.title).to eq("Bacon")
   end
 end
