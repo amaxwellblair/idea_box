@@ -24,7 +24,7 @@ module Api
 
       private
         def idea_params
-          params.permit(:title, :body)
+          params.permit(:title, :body, :quality)
         end
     end
   end
