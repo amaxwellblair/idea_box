@@ -2,6 +2,7 @@ $(document).ready(function() {
   getIdeas(function() {
     updateIdea();
     destroyIdea();
+    updateQuality();
   });
   $(".modal-trigger").leanModal();
   $("#create-trigger").click(function() {
@@ -29,6 +30,8 @@ function createIdea() {
     $("#create-title").val("");
     $("#create-body").val("");
     updateIdea();
+    destroyIdea();
+    updateQuality();
   });
 }
 
@@ -41,10 +44,57 @@ function updateIdea() {
         var id = extractID(this.href);
         var title = this.querySelector("#title-" + id);
         var body = this.querySelector("#body-" + id);
-        patchIdea(id, title.innerHTML, body.innerHTML);
+        var quality = document.querySelector("#quality-" + id);
+        patchIdea(id, quality.innerHTML, title.innerHTML, body.innerHTML);
       }
     };
   });
+}
+
+function updateQuality() {
+  updatePositive();
+  updateNegative();
+}
+
+function updateNegative() {
+  var options = { 0: "bad", 1: "good", 2: "excellent" };
+  var downvotes = document.querySelectorAll(".downvote-trigger");
+  var downvote = function () {
+    var id = extractID(this.id);
+    var quality = options[nextQuality(id, -1)];
+    document.querySelector("#quality-" + id).innerHTML = quality;
+    patchIdea(id, quality);
+  };
+  for (var i = 0; i < downvotes.length; i++) {
+    id = extractID(downvotes[i].id);
+    downvotes[i].onclick = downvote;
+  }
+}
+
+function updatePositive() {
+  var options = { 0: "bad", 1: "good", 2: "excellent" };
+  var upvotes = document.querySelectorAll(".upvote-trigger");
+  var upvote = function () {
+    var id = extractID(this.id);
+    var quality = options[nextQuality(id, 1)];
+    document.querySelector("#quality-" + id).innerHTML = quality;
+    patchIdea(id, quality);
+  };
+  for (var i = 0; i < upvotes.length; i++) {
+    id = extractID(upvotes[i].id);
+    upvotes[i].onclick = upvote;
+  }
+}
+
+function nextQuality(id, modifier) {
+  var quality = document.querySelector("#quality-" + id);
+  var options = { bad: 0, good: 1, excellent: 2 };
+  var change = options[quality.innerHTML] + modifier;
+  if (change < 0 || change > 2) {
+    return options[quality.innerHTML];
+  } else {
+    return options[quality.innerHTML] + modifier;
+  }
 }
 
 function destroyIdea() {
@@ -68,13 +118,13 @@ function deleteIdea(id) {
   });
 }
 
-function patchIdea(id, title, body) {
+function patchIdea(id, quality, title, body) {
   $.ajax({
     type: "POST",
     dataType: "json",
     url: "/api/v1/idea/" + id + ".json",
     headers: { "X-HTTP-Method-Override": "PATCH" },
-    data: { title: title, body: body },
+    data: { title: title, body: body, quality: quality },
     success: function() {
       overwriteIdea(id, title, body);
     }
@@ -109,10 +159,10 @@ function ideaDiv(idea, content) {
   var buttonHolder = document.createElement("div");
   buttonHolder.className = "card-action";
 
-  var deleteButton = document.createElement("button");
-  deleteButton.id = "delete-" + idea.id;
-  deleteButton.className = "delete-trigger btn";
-  deleteButton.innerHTML = "Delete";
+  var deleteButton = createDeleteButton(idea.id);
+  var upvoteButton = createUpvoteButton(idea.id);
+  var downvoteButton = createDownvoteButton(idea.id);
+  var qualityBox = createQuality(idea.id, idea.quality);
 
   var link = document.createElement("a");
   link.className = "update-trigger";
@@ -123,8 +173,42 @@ function ideaDiv(idea, content) {
   innerIdea.innerHTML = content;
 
   link.appendChild(innerIdea);
+  buttonHolder.appendChild(qualityBox);
+  buttonHolder.appendChild(upvoteButton);
+  buttonHolder.appendChild(downvoteButton);
   buttonHolder.appendChild(deleteButton);
   card.appendChild(link);
   card.appendChild(buttonHolder);
   return card;
+}
+
+function createQuality(id, quality) {
+  var qualityBox = document.createElement("p");
+  qualityBox.id = "quality-" + id;
+  qualityBox.innerHTML = quality;
+  return qualityBox;
+}
+
+function createDeleteButton(id) {
+  var deleteButton = document.createElement("button");
+  deleteButton.id = "delete-" + id;
+  deleteButton.className = "delete-trigger btn";
+  deleteButton.innerHTML = "Delete";
+  return deleteButton;
+}
+
+function createUpvoteButton(id) {
+  var upvoteButton = document.createElement("button");
+  upvoteButton.id = "upvote-" + id;
+  upvoteButton.className = "upvote-trigger btn";
+  upvoteButton.innerHTML = "Upvote";
+  return upvoteButton;
+}
+
+function createDownvoteButton(id) {
+  var downvoteButton = document.createElement("button");
+  downvoteButton.id = "downvote-" + id;
+  downvoteButton.className = "downvote-trigger btn";
+  downvoteButton.innerHTML = "Downvote";
+  return downvoteButton;
 }
