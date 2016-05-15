@@ -98,10 +98,14 @@ function nextQuality(id, modifier) {
 }
 
 function destroyIdea() {
-  document.querySelector(".delete-trigger").onclick = function () {
+  var deletions = document.querySelectorAll(".delete-trigger");
+  var deleteIt = function () {
     var id = extractID(this.id);
     deleteIdea(id);
   };
+  for (var i = 0; i < deletions.length; i++) {
+    deletions[i].onclick = deleteIt;
+  }
 }
 
 function deleteIdea(id) {
