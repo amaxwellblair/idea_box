@@ -3,12 +3,32 @@ $(document).ready(function() {
     updateIdea();
     destroyIdea();
     updateQuality();
+    filterIdeas();
   });
   $(".modal-trigger").leanModal();
   $("#create-trigger").click(function() {
     createIdea();
   });
 });
+
+function filterIdeas() {
+  var titles = document.querySelectorAll(".title-box");
+  var bodies = document.querySelectorAll(".body-box");
+  var search = document.querySelector("#search-box");
+  search.onkeyup = function () {
+    var phrase = this.value;
+    for (var i = 0; i < titles.length; i++) {
+      var text = titles[i].innerHTML + " " + bodies[i].innerHTML;
+      var id = extractID(titles[i].id);
+      var card = document.querySelector("#card-" + id);
+      if (_.includes(text, phrase) !== true) {
+        card.style.display = "none";
+      } else {
+        card.style.display = "";
+      }
+    }
+  };
+}
 
 function getIdeas(callback) {
   $.get("/api/v1/ideas.json", function(data) {
@@ -32,18 +52,21 @@ function createIdea() {
     updateIdea();
     destroyIdea();
     updateQuality();
+    filterIdeas();
   });
 }
 
 function updateIdea() {
   $(".update-trigger").click(function() {
-    this.contentEditable = true;
+    var id = extractID(this.href);
+    var title = this.querySelector("#title-" + id);
+    var body = this.querySelector("#body-" + id);
+    title.contentEditable = true;
+    body.contentEditable = true;
     this.onkeypress = function (key) {
       if (key.keyCode === 13) {
-        this.contentEditable = false;
-        var id = extractID(this.href);
-        var title = this.querySelector("#title-" + id);
-        var body = this.querySelector("#body-" + id);
+        title.contentEditable = false;
+        body.contentEditable = false;
         var quality = document.querySelector("#quality-" + id);
         patchIdea(id, quality.innerHTML, title.innerHTML, body.innerHTML);
       }
@@ -150,8 +173,8 @@ function extractID(that) {
 }
 
 function appendIdea(idea) {
-  var content = "<div id=title-" + idea.id + ">" + idea.title + "</div>";
-  content = content + "<div id=body-" + idea.id + ">" + idea.body + "</div>";
+  var content = "<div class='title-box' id=title-" + idea.id + ">" + idea.title + "</div>";
+  content = content + "<div class='body-box' id=body-" + idea.id + ">" + idea.body + "</div>";
   $("#all-ideas").append(ideaDiv(idea, content));
 }
 
@@ -170,7 +193,7 @@ function ideaDiv(idea, content) {
 
   var link = document.createElement("a");
   link.className = "update-trigger";
-  link.href = "#idea-" + idea.id;
+  link.href = "#id-" + idea.id;
 
   var innerIdea = document.createElement("div");
   innerIdea.id = "idea-" + idea.id;
