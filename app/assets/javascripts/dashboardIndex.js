@@ -61,12 +61,12 @@ function updateIdea() {
     var id = extractID(this.href);
     var title = this.querySelector("#title-" + id);
     var body = this.querySelector("#body-" + id);
-    title.contentEditable = true;
-    body.contentEditable = true;
+    title.contentEditable = "true";
+    body.contentEditable = "true";
     this.onkeypress = function (key) {
       if (key.keyCode === 13) {
-        title.contentEditable = false;
-        body.contentEditable = false;
+        title.contentEditable = "false";
+        body.contentEditable = "false";
         var quality = document.querySelector("#quality-" + id);
         patchIdea(id, quality.innerHTML, title.innerHTML, body.innerHTML);
       }
@@ -173,8 +173,8 @@ function extractID(that) {
 }
 
 function appendIdea(idea) {
-  var content = "<div class='title-box' id=title-" + idea.id + ">" + idea.title + "</div>";
-  content = content + "<div class='body-box' id=body-" + idea.id + ">" + idea.body + "</div>";
+  var content = "<div class='title-box' contentEditable='false' id=title-" + idea.id + ">" + idea.title + "</div>";
+  content = content + "<div class='body-box' contentEditable='false' id=body-" + idea.id + ">" + idea.body + "</div>";
   $("#all-ideas").append(ideaDiv(idea, content));
 }
 
