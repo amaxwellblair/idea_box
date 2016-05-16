@@ -59,8 +59,8 @@ function createIdea() {
 function updateIdea() {
   $(".update-trigger").click(function() {
     var id = extractID(this.href);
-    var title = this.querySelector("#title-" + id);
-    var body = this.querySelector("#body-" + id);
+    var title = document.querySelector("#title-" + id);
+    var body = document.querySelector("#body-" + id);
     title.contentEditable = "true";
     body.contentEditable = "true";
     this.onkeypress = function (key) {
