@@ -59,16 +59,20 @@ function createIdea() {
 function updateIdea() {
   $(".update-trigger").click(function() {
     var id = extractID(this.href);
-    var title = document.querySelector("#title-" + id);
-    var body = document.querySelector("#body-" + id);
-    title.contentEditable = "true";
-    body.contentEditable = "true";
+    $("#title-" + id).attr("contentEditable", true);
+    $("#body-" + id).attr("contentEditable", true);
+    // title.contentEditable = "true";
+    // body.contentEditable = "true";
     this.onkeypress = function (key) {
       if (key.keyCode === 13) {
-        title.contentEditable = "false";
-        body.contentEditable = "false";
-        var quality = document.querySelector("#quality-" + id);
-        patchIdea(id, quality.innerHTML, title.innerHTML, body.innerHTML);
+        $("#title-" + id).attr("contentEditable", false);
+        $("#body-" + id).attr("contentEditable", false);
+        var title = $("#title-" + id).html();
+        var body = $("#body-" + id).html();
+        var quality = $("#quality-" + id).html();
+        // title.contentEditable = "false";
+        // body.contentEditable = "false";
+        patchIdea(id, quality, title, body);
       }
     };
   });
