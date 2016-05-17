@@ -57,25 +57,26 @@ function createIdea() {
 }
 
 function updateIdea() {
-  $(".update-trigger").click(function() {
+  var updates = document.querySelectorAll(".update-trigger");
+  var edit = function() {
     var id = extractID(this.href);
-    $("#title-" + id).attr("contentEditable", true);
-    $("#body-" + id).attr("contentEditable", true);
-    // title.contentEditable = "true";
-    // body.contentEditable = "true";
+    var title = this.querySelector("#title-" + id);
+    var body = this.querySelector("#body-" + id);
+    title.contentEditable = true;
+    body.contentEditable = true;
     this.onkeypress = function (key) {
       if (key.keyCode === 13) {
-        $("#title-" + id).attr("contentEditable", false);
-        $("#body-" + id).attr("contentEditable", false);
-        var title = $("#title-" + id).html();
-        var body = $("#body-" + id).html();
-        var quality = $("#quality-" + id).html();
-        // title.contentEditable = "false";
-        // body.contentEditable = "false";
-        patchIdea(id, quality, title, body);
+        title.contentEditable = false;
+        body.contentEditable = false;
+        var quality = document.querySelector("#quality-" + id);
+        patchIdea(id, quality.innerHTML, title.innerHTML, body.innerHTML);
       }
     };
-  });
+  };
+
+  for (var i = 0; i < updates.length; i++) {
+    updates[i].onclick = edit;
+  }
 }
 
 function updateQuality() {
@@ -177,8 +178,8 @@ function extractID(that) {
 }
 
 function appendIdea(idea) {
-  var content = "<div class='title-box' contentEditable='false' id=title-" + idea.id + ">" + idea.title + "</div>";
-  content = content + "<div class='body-box' contentEditable='false' id=body-" + idea.id + ">" + idea.body + "</div>";
+  var content = "<div class='title-box' id=title-" + idea.id + ">" + idea.title + "</div>";
+  content = content + "<div class='body-box' id=body-" + idea.id + ">" + idea.body + "</div>";
   $("#all-ideas").append(ideaDiv(idea, content));
 }
 
